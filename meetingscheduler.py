@@ -14,97 +14,124 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with Meeting Scheduler.  If not, see <https://www.gnu.org/licenses/>.
+#
 #  Original Author: Ansh Gandhi
 #  Original Source Code: <https://github.com/anshgandhi4/MeetingScheduler/>
 #
 #  EVERYTHING ABOVE THIS LINE MUST BE KEPT AS IS UNDER GNU GPL LICENSE RULES.
 
-# Import Classes
-import webbrowser
+from tkinter import *
+from tkinter import messagebox
+from tkinter.ttk import Progressbar
 import datetime
 import time as sleeptime
-import sys
-import os
+import webbrowser
+from functions import *
+from menubar import MenuBar
 
-# Open File
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+class Scheduler(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master, bg = "white")
+        self.grid()
 
-linksfile = open(resource_path("links.txt"), "r")
-links = list(map(lambda line:line.strip(), linksfile.readlines()))
-linksfile.close()
+        # Declaring Attributes
+        self.VERSION = 2.0
+        self.ctime = None
+        self.day = None
+        self.links = None
+        self.schedule = None
+        self.buffer = None
+        self.buffertime = None
+        self.sched = None
 
-# Generate Link Variables
-PERIOD1 = links[0]
-PERIOD2 = links[1]
-PERIOD3 = links[2]
-PERIOD4 = links[3]
-PERIOD5 = links[4]
-PERIOD6 = links[5]
-BUFFERTIME = int(links[6])
-VERSION = 1.0
+        # GUI Elements
+        self.time = Label(self, bg = "white", font = ("Arial", 24), text = "00:00")
+        self.time.grid(row = 0, column = 0)
 
-print("Meeting Scheduler Version " + str(VERSION))
-while True:
-    # Get Time Information
-    ctime = datetime.datetime.now()
-    day = ctime.isoweekday()
-    currenttime = datetime.datetime.now()
-    if currenttime.time() > datetime.time(14, 30):
-        print("No More School Today!")
-        break
-    buffertime = str(currenttime + datetime.timedelta(minutes = BUFFERTIME))[11:16]
-    print(str(currenttime)[11:16])
+        self.progress = Progressbar(self, orient = HORIZONTAL, length = 250, mode = "determinate")
+        self.progress.grid(row = 1, column = 0, padx = (20, 20))
 
-    # Get Link
-    link = ""
-    if day == 1:
-        if buffertime == "08:00":
-            print("Opening Period 1 Meeting Link")
-            link = PERIOD1
-        elif buffertime == "08:50":
-            print("Opening Period 2 Meeting Link")
-            link = PERIOD2
-        elif buffertime == "10:45":
-            print("Opening Period 3 Meeting Link")
-            link = PERIOD3
-        elif buffertime == "11:35":
-            print("Opening Period 4 Meeting Link")
-            link = PERIOD4
-        elif buffertime == "12:55":
-            print("Opening Period 5 Meeting Link")
-            link = PERIOD5
-        elif buffertime == "13:45":
-            print("Opening Period 6 Meeting Link")
-            link = PERIOD6
-    elif day == 2 or day == 4:
-        if buffertime == "08:00":
-            print("Opening Period 1 Meeting Link")
-            link = PERIOD1
-        elif buffertime == "10:45":
-            print("Opening Period 3 Meeting Link")
-            link = PERIOD3
-        elif buffertime == "12:55":
-            print("Opening Period 5 Meeting Link")
-            link = PERIOD5
-    elif day == 3 or day == 5:
-        if buffertime == "08:00":
-            print("Opening Period 2 Meeting Link")
-            link = PERIOD2
-        elif buffertime == "10:45":
-            print("Opening Period 4 Meeting Link")
-            link = PERIOD4
-        elif buffertime == "12:55":
-            print("Opening Period 6 Meeting Link")
-            link = PERIOD6
+        self.message = Label(self, bg = "white", font = ("Arial", 14), text = "")
+        self.message.grid(row = 2, column = 0)
 
-    # Open Link
-    if link != "":
-        webbrowser.open_new_tab(link)
+        # Run Functions
+        self.init()
+        self.timer()
 
-    # Loop Every Minute
-    sleeptime.sleep(60)
+    def init(self):
+        # Take Link and Schedule Data
+        self.links = read("links.txt")
+        self.schedule = read("schoolschedule.txt")
+
+        # Get Buffer Time
+        try:
+            self.buffer = int(self.links[-1])
+        except:
+            sys.exit()
+
+        # Get Time Information
+        self.ctime = datetime.datetime.now()
+        self.day = self.ctime.isoweekday()
+        self.sched = get_schedule_for_today(self.day, self.schedule)
+
+    def timer(self):
+        # Update Time Information, Recalculate Schedule if Needed
+        self.ctime = datetime.datetime.now()
+        if self.ctime.isoweekday() != self.day:
+            self.day = self.ctime.isoweekday()
+            self.sched = get_schedule_for_today(self.day, self.schedule)
+        self.buffertime = self.ctime + datetime.timedelta(minutes = self.buffer)
+
+        # Exit if School is Over
+        try:
+            if len(self.sched) == 0 or datetime.timedelta(seconds = 0) <= self.ctime - time_to_datetime(self.ctime, self.sched[-1][2]) <= datetime.timedelta(seconds = 60):
+                sys.exit()
+        except:
+            sys.exit()
+
+        # Get Starting Period Number
+        link = None
+        currentperiodindex = None
+        currentperiod = None
+        for period in self.sched:
+            if self.buffertime.time() > period[1]:
+                timewindow = self.buffertime - time_to_datetime(self.ctime, period[1])
+            else:
+                timewindow = datetime.timedelta(seconds = 0)
+            if datetime.timedelta(seconds = 0) < timewindow:
+                currentperiodindex = self.sched.index(period)
+                currentperiod = self.sched[currentperiodindex][0]
+                if timewindow <= datetime.timedelta(seconds = 60):
+                    try:
+                        link = self.links[currentperiod]
+                    except:
+                        sys.exit()
+                    break
+
+        # Open Meeting Link and Update Progress Bar
+        if link is not None:
+            self.message["text"] = "Opening Link for Period " + str(currentperiod)
+            webbrowser.open_new_tab(link)
+        elif currentperiodindex is not None:
+            curdiff = self.ctime - time_to_datetime(self.ctime, self.sched[currentperiodindex][1])
+            fulldiff = time_to_datetime(self.ctime,self.sched[currentperiodindex][2]) - time_to_datetime(self.ctime, self.sched[currentperiodindex][1])
+            self.progress["value"] = curdiff / fulldiff * 100
+        else:
+            self.progress["value"] = 0
+
+        # Update Output and Sleep
+        self.time["text"] = str(self.ctime)[11:16]
+        root.after(60000, self.timer)
+
+# Run Simulator
+root = Tk()
+root.title("Meeting Scheduler")
+try:
+    root.iconbitmap(resource_path("meetingschedulericon.ico"))
+except:
+    pass
+scheduler = Scheduler(root)
+menu = Menu(root)
+menubar = MenuBar(root, menu, scheduler)
+root.configure(menu = menu, background = "white")
+scheduler.mainloop()
