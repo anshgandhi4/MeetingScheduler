@@ -15,7 +15,7 @@ By running, copying, distributing, and/or modifying any part of this repository,
  
 **The second step is to set up a "links.txt" file.**
 
- 1. Create a new file in the same directory as this file and call it "links.txt".
+ 1. Open "links.txt".
  2. In the first line, write the meeting link for your zero period class.
  3. In the second line, write the meeting link for your first period class.
  4. Repeat this for all of your classes.
@@ -25,7 +25,7 @@ By running, copying, distributing, and/or modifying any part of this repository,
 
 **The third step is to set up a "schoolschedule.txt" file.**
 
- 1. Create a new file in the same directory as this file and call it "schoolschedule.txt".
+ 1. Open "schoolschedule.txt".
  2. In the first line, write the name of your school.
  3. Write all of the days of the week in separate lines.
  4. Underneath each day of the week, write the period numbers of all of the classes you will have that day in separate lines.
