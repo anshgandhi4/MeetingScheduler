@@ -55,15 +55,18 @@ You don't have anything scheduled for the day, so the program just terminates.
 ### Current Features
 Meeting Scheduler Features include:
  - Automatically opens meeting links for different classes
- - Opens the links in your default browser
+ - Opens meetings links in your default browser
  - Works with any school/bell schedule
  - Automatically terminates after school is over for the day
  - Small GUI window with help menu
  - Progress bar lets you know how much of the period is over
  - Custom icon
-### Version 2.0 (08/31/29)
+### Version 2.1 (08/31/20)
+ - Bug fixes
+ - Typo fixes
+### Version 2.0 (08/31/20)
  - Created GUI
  - Added multiple school/bell schedule support
- - Small bugs fixed
+ - Bug fixes
 ### Version 1.0 (08/27/20)
  - Initial release

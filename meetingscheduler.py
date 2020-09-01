@@ -35,7 +35,7 @@ class Scheduler(Frame):
         self.grid()
 
         # Declaring Attributes
-        self.VERSION = 2.0
+        self.VERSION = 2.1
         self.ctime = None
         self.day = None
         self.links = None
@@ -116,8 +116,10 @@ class Scheduler(Frame):
             curdiff = self.ctime - time_to_datetime(self.ctime, self.sched[currentperiodindex][1])
             fulldiff = time_to_datetime(self.ctime,self.sched[currentperiodindex][2]) - time_to_datetime(self.ctime, self.sched[currentperiodindex][1])
             self.progress["value"] = curdiff / fulldiff * 100
+            self.message["text"] = ""
         else:
             self.progress["value"] = 0
+            self.message["text"] = ""
 
         # Update Output and Sleep
         self.time["text"] = str(self.ctime)[11:16]
