@@ -9,8 +9,8 @@ By running, copying, distributing, and/or modifying any part of this repository,
 ## How to Use This Code
 ### Download/Setup
 **The first step is to download the official source code.**
- 1. Go to the [official Meeting Scheduler GitHub page](https://github.com/anshgandhi4/MeetingScheduler).
- 2. Click on the green "Code" button and click on "Download ZIP".
+ 1. Go to the [Meeting Scheduler GitHub release page](https://github.com/anshgandhi4/MeetingScheduler/releases/tag/v2.1).
+ 2. Click on "SourceCode.zip".
  3. Unzip the folder.
  
 **The second step is to set up a "links.txt" file.**
