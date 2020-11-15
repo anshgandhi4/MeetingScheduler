@@ -55,10 +55,10 @@ def time_to_datetime(ctime, time):
     return datetime.datetime.combine(ctime, time)
 
 def get_schedule_for_today(day, schedule):
-    if DAYSOFTHEWEEK[day] == "Saturday":
-        sched = schedule[schedule.index(DAYSOFTHEWEEK[day]) + 1:]
+    if DAYSOFTHEWEEK[day % 7] == "Saturday":
+        sched = schedule[schedule.index(DAYSOFTHEWEEK[day % 7]) + 1:]
     else:
-        sched = schedule[schedule.index(DAYSOFTHEWEEK[day]) + 1:schedule.index(DAYSOFTHEWEEK[day + 1])]
+        sched = schedule[schedule.index(DAYSOFTHEWEEK[day % 7]) + 1:schedule.index(DAYSOFTHEWEEK[(day + 1) % 7])]
     for periodIndex in range(len(sched)):
         sched[periodIndex] = list(map(lambda item: string_to_time(item), sched[periodIndex].split()))
     return sched
